@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 using TDTK;
 
 
@@ -16,31 +17,64 @@ namespace TDTK {
 		public bool InputControlIsOn,SelectTowerUI,CheckIndexIsOn ;
 		private List<int> m_CreatIndexArray,expectedList;
 		public int m_index;
-		public float m_addMoneyTime;
-		private RaycastHit hit;
+ 		private RaycastHit hit;
 		public Transform m_AllTower ;
 		public List<UnitTower> m_activeTowerList;
 		public TowerSoliderController m_TSC;
+		public float m_addMoneyTime = 1.0f;
+		public int m_RewardMoney;
+		public int m_MaxRewardTime;
+		public int m_RewardMax;
+		public string m_RewardTimeShow;
+		private int m_RewardTime;
+		private int m_RewardIndex;
 
 		// Use this for initialization
 		void Start () {
-			m_addMoneyTime = 1.0f;
+			m_RewardIndex = 0;
+			m_RewardTime = m_MaxRewardTime;
 			InputControlIsOn = true;
 			SelectTowerUI = false;
 			CheckIndexIsOn = false;
 
 
 			InvokeRepeating ("AddCash", m_addMoneyTime, m_addMoneyTime);
-			
+
+			InvokeRepeating ("CheckTime", 1, 1);
+		}
+
+		public void CheckTime(){
+			m_RewardTime -= 1;
+			TimeSpan timeSpan = TimeSpan.FromSeconds(m_RewardTime);
+			m_RewardTimeShow = string.Format ("{0:D2}:{1:D2}",timeSpan.Minutes, timeSpan.Seconds);
+			Debug.Log (m_RewardTimeShow);
+			if(m_RewardTime == 0){
+				AddRewardCash();
+				m_RewardTime = m_MaxRewardTime;
+			}
 		}
 
 		public void AddCash(){
 			//自動增加資源的程式，取當前的值然後＋上一個值在更新
 			int money;
 			money = m_RscManager.rscList [0];
-			m_RscManager.rscList = new List<int>{money + 1,10};
+			m_RscManager.rscList = new List<int>{money + 1,1};
 			//更新目前前導核心（包含ＵＩ）
 			TDTK.OnRscChanged (m_RscManager.rscList);
+		}
+
+		public void AddRewardCash(){
+			if (m_RewardIndex + 1 > m_RewardMax) {
+				return;
+			} else {
+				m_RewardIndex += 1;
+				//自動增加資源的程式，取當前的值然後＋上一個值在更新
+				int money;
+				money = m_RscManager.rscList [0];
+				m_RscManager.rscList = new List<int>{ money + m_RewardMoney, 1};
+				//更新目前前導核心（包含ＵＩ）
+				TDTK.OnRscChanged (m_RscManager.rscList);
+			}
 		}
 
 		public void CheckIndex(){
