@@ -27,6 +27,7 @@ namespace TDTK {
 		public int m_RewardMax;
 		public string m_RewardTimeShow;
 		public bool m_SpawnIson = false;
+		public float m_AutoSpawnTime;
 		private int m_RewardTime;
 		private int m_RewardIndex;
 
@@ -159,7 +160,7 @@ namespace TDTK {
 			}
 
 			if(m_SpawnIson){
-				InvokeRepeating ("CheckSpawn",1,10);
+				InvokeRepeating ("CheckSpawn",1,m_AutoSpawnTime);
 				m_SpawnIson = false;
 			}
 		}
