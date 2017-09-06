@@ -26,6 +26,7 @@ namespace TDTK {
 		public int m_MaxRewardTime;
 		public int m_RewardMax;
 		public string m_RewardTimeShow;
+		public bool m_SpawnIson = false;
 		private int m_RewardTime;
 		private int m_RewardIndex;
 
@@ -39,21 +40,27 @@ namespace TDTK {
 
 
 			InvokeRepeating ("AddCash", m_addMoneyTime, m_addMoneyTime);
-
 			InvokeRepeating ("CheckTime", 1, 1);
 		}
 
+		//Check Auto Spawn
+		public void CheckSpawn(){
+			SpawnManager.Spawn();
+		}
+
+		//Check Reward time
 		public void CheckTime(){
-			m_RewardTime -= 1;
-			TimeSpan timeSpan = TimeSpan.FromSeconds(m_RewardTime);
-			m_RewardTimeShow = string.Format ("{0:D2}:{1:D2}",timeSpan.Minutes, timeSpan.Seconds);
-			Debug.Log (m_RewardTimeShow);
+			m_RewardTime -= 1; //每次減一秒
+			TimeSpan timeSpan = TimeSpan.FromSeconds(m_RewardTime);//轉成TimeSpan
+			m_RewardTimeShow = string.Format ("{0:D2}:{1:D2}",timeSpan.Minutes, timeSpan.Seconds);//轉換成分秒格式
+			//Debug.Log (m_RewardTimeShow);
 			if(m_RewardTime == 0){
 				AddRewardCash();
 				m_RewardTime = m_MaxRewardTime;
 			}
 		}
 
+		//Add Cash
 		public void AddCash(){
 			//自動增加資源的程式，取當前的值然後＋上一個值在更新
 			int money;
@@ -63,6 +70,7 @@ namespace TDTK {
 			TDTK.OnRscChanged (m_RscManager.rscList);
 		}
 
+		//Add Reward Cash
 		public void AddRewardCash(){
 			if (m_RewardIndex + 1 > m_RewardMax) {
 				return;
@@ -137,18 +145,22 @@ namespace TDTK {
 									}
 								} 
 							} else {
-							
+
 							}
 
 						} else if (Input.GetMouseButtonDown (1)) {
 							//m_BuildButtonUIController.OnBuildButton2 ();
 							SelectTowerUI = false;
 							m_BuildButtonUIController.CheckTowerManagerMouseClick ();
-							//m_BuildButtonUIController.OnExitBuildButton (m_SelectPlatfromController.m_index);
 							CheckIndexIsOn = false;
 						}
 					}
 				}
+			}
+
+			if(m_SpawnIson){
+				InvokeRepeating ("CheckSpawn",1,10);
+				m_SpawnIson = false;
 			}
 		}
 
